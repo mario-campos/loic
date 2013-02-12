@@ -40,7 +40,7 @@ GetOptions(\%in,
 ## Check for incompatible/missing switches
 ############################################
 die "Usage: loic.pl [--{tcp|syn|udp|http}] [--path X] [--threads X] [--dport X] [--source <ip>] <target>\n"
-    if($in{help} || $in{h});
+    if defined( $in{help} // $in{h} );
 
 die "error: no target\n" unless $ARGV[0];
 
@@ -50,16 +50,16 @@ if(!(defined $Config{useithreads}) && $in{threads}) {
 }
 
 die "error: source spoofing only works with SYN mode and UDP mode\n" 
-    if $in{source} && ($in{http} || $in{tcp});
+    if defined $in{source} && defined( $in{http} // $in{tcp} );
 
 ############################################
 ## Set default settings
 ############################################
-$in{source} = $in{source} || join('.', map int rand 256, 1..4);
-$in{threads} = $in{threads} || 0;
-$in{tcp} = 1 unless($in{udp} || $in{http} || $in{syn});
-$in{dport} = $in{dport} || 80;
-$in{path} = $in{path} || '/';
+$in{source} = $in{source} // join('.', map int rand 256, 1..4);
+$in{threads} = $in{threads} // 0;
+$in{tcp} = 1 unless defined($in{udp} // $in{http} // $in{syn});
+$in{dport} = $in{dport} // 80;
+$in{path} = $in{path} // '/';
 
 ############################################
 ## Create Threads
