@@ -10,7 +10,7 @@ You will need:
 
 ### Usage
 
-_loic_ follows the GNU standard for command-line options.
+    loic.pl [--{tcp|syn|udp|http}] [--path X] [--threads X] [--dport X] [--source <ip>] <target>
 
 ### Documentation
 
